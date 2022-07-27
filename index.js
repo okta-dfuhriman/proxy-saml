@@ -26,20 +26,15 @@ const setCommonHeaders = async (resp, origin) => {
 
 const handler = async req => {
     try {
-        const { method } = req || {};
+        const request = new Request(req.clone());
 
-        const { origin } = Object.fromEntries(req.headers) || {};
+        const { method } = request || {};
 
-        let response = await fetch(req, { withCredentials: true });
-
-        if (response && response.ok) {
-            const newResponse = await doToken(response.clone(), origin, method);
-
-            // ADD logic here to be done before returning the response.
-            // await setCommonHeaders(newResponse, origin);
-
-            return newResponse;
+        if (method === 'POST') {
+            console.log((await request.text()) || 'No body... :( ');
         }
+
+        let response = await fetch(req);
 
         return response;
     } catch (error) {
@@ -54,11 +49,11 @@ const router = Router();
 /*
 Our index route, a simple hello world.
 */
-router.get('/', () => {
-    return new Response(
-        'Hello, world! This is the root page of your Worker template.'
-    );
-});
+// router.get('/', () => {
+//     return new Response(
+//         'Hello, world! This is the root page of your Worker template.'
+//     );
+// });
 
 /*
 Okta makes an OPTIONS and POST call for /token that both need to be captured so using router.all().
